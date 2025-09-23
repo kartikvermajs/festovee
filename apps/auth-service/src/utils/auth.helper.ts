@@ -195,6 +195,36 @@ export const verifyOtp = async (
   await redis.del(`otp:${email}`, failedAttemptsKey);
 };
 
+// export const handleForgotPassword = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction,
+//   userType: "user" | "seller"
+// ) => {
+//   try {
+//     const { email } = req.body as { email?: string };
+
+//     if (!email) throw new ValidationError("Email is required!");
+
+//     const user =
+//       userType === "user" &&
+//       (await prisma.users.findUnique({ where: { email } }));
+
+//     if (!user) throw new ValidationError(`${userType} not found!`);
+
+//     await checkOtpRestriction(email, next);
+//     await trackOtpRequests(email, next);
+
+//     await sendOtp(email, user.name, "forgot-password-user-mail");
+
+//     res
+//       .status(200)
+//       .json({ message: "OTP sent to email. Please verify your account" });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const handleForgotPassword = async (
   req: Request,
   res: Response,
@@ -206,16 +236,17 @@ export const handleForgotPassword = async (
 
     if (!email) throw new ValidationError("Email is required!");
 
-    const user =
-      userType === "user" &&
-      (await prisma.users.findUnique({ where: { email } }));
+    const user = userType === "user";
+    await prisma.users.findUnique({ where: { email } });
 
     if (!user) throw new ValidationError(`${userType} not found!`);
 
     await checkOtpRestriction(email, next);
     await trackOtpRequests(email, next);
 
-    await sendOtp(email, user.name, "forgot-password-user-mail");
+    await sendOtp(user.name, email, "forgot-password-user-mail");
+
+    console.log("Sent forgot-password OTP to:", email);
 
     res
       .status(200)

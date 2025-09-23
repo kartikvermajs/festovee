@@ -42,12 +42,47 @@ export const UserRegistration = async (
 };
 
 //verify user with otp
+// export const verifyUser = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const { email, otp, password, name } = req.body;
+//     if (!email || !otp || !password || !name) {
+//       return next(new ValidationError("All fields are required!!"));
+//     }
+
+//     const existingUser = await prisma.users.findUnique({ where: { email } });
+
+//     if (existingUser) {
+//       return next(new ValidationError("User already exists with this email"));
+//     }
+
+//     await verifyOtp(email, otp, next);
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     prisma.users.create({
+//       data: { name, email, password: hashedPassword },
+//     });
+
+//     res.status(201).json({
+//       success: true,
+//       message: "User registered successfully!",
+//     });
+//   } catch (error) {
+//     return next(error);
+//   }
+// };
+
 export const verifyUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
+    console.log("verifyUser called with body:", req.body);
+
     const { email, otp, password, name } = req.body;
     if (!email || !otp || !password || !name) {
       return next(new ValidationError("All fields are required!!"));
@@ -59,18 +94,25 @@ export const verifyUser = async (
       return next(new ValidationError("User already exists with this email"));
     }
 
+    // this throws on failure
     await verifyOtp(email, otp, next);
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    prisma.users.create({
+    // IMPORTANT: await the create call
+    const created = await prisma.users.create({
       data: { name, email, password: hashedPassword },
     });
+
+    console.log("User created:", created);
 
     res.status(201).json({
       success: true,
       message: "User registered successfully!",
+      user: { id: created.id, email: created.email, name: created.name },
     });
   } catch (error) {
+    console.error("verifyUser error:", error);
     return next(error);
   }
 };
