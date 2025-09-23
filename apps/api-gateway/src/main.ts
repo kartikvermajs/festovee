@@ -1,6 +1,6 @@
 import express from "express";
 import proxy from "express-http-proxy";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import morgan from "morgan";
 // import swaggerUi from "swagger-ui-express";
 import cookieParser from "cookie-parser";
@@ -43,10 +43,7 @@ app.use(
     message: { error: "Too many requests, please try again later!" },
     standardHeaders: true,
     legacyHeaders: true,
-    keyGenerator: (req: Request): string => {
-      // Use IPv4/IPv6-safe string
-      return req.ip || req.connection.remoteAddress || "";
-    },
+    keyGenerator: (req: Request) => ipKeyGenerator(req as any),
   })
 );
 
