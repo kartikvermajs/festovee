@@ -1,12 +1,12 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
 import { Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios, { AxiosError } from "axios";
 import { countries } from "apps/seller-ui/src/utils/countries";
 import Link from "next/link";
+import CreateShop from "apps/seller-ui/src/shared/modules/auth/create-shop";
 
 const Signup = () => {
   const [activeStep, setActiveStep] = useState(1);
@@ -20,12 +20,12 @@ const Signup = () => {
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const router = useRouter();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm();
 
   const startResedTimer = () => {
     const interval = setInterval(() => {
@@ -95,6 +95,21 @@ const Signup = () => {
 
   const resendOtp = () => {
     if (sellerData) signupMutation.mutate(sellerData);
+  };
+
+  const connectStripe = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/create-stripe-link`,
+        { sellerId }
+      );
+
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      }
+    } catch (error) {
+      console.error("Stripe connection Error", error);
+    }
   };
 
   return (
@@ -297,6 +312,22 @@ const Signup = () => {
               </div>
             )}
           </>
+        )}
+        {activeStep === 2 && (
+          <CreateShop sellerId={sellerId} setActiveStep={setActiveStep} />
+        )}
+        {activeStep === 3 && (
+          <div className="text-center">
+            <h3 className="text-2xl font-semibold">Withdraw Method</h3>
+            <br />
+
+            <button
+              onClick={connectStripe}
+              className="w-full flex items-center justify-center gap-3 rounded-lg bg-[#635BFF] px-4 py-3 text-white font-medium shadow-md hover:bg-[#5851DB] active:scale-95 active:shadow-inner transition-all duration-150"
+            >
+              <span className="font-bold text-xl">Connect with Stripe</span>
+            </button>
+          </div>
         )}
       </div>
     </div>
