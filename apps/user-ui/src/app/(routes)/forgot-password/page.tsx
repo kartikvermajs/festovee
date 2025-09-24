@@ -144,7 +144,7 @@ const ForgotPassword = () => {
   };
   const onSubmitPassword = ({ password }: { password: string }) => {
     resetPasswordMutation.mutate({ password });
-  }; 
+  };
 
   return (
     <div className="w-full py-10 min-h-[85vh] bg-[#f1f1f1]">
@@ -231,10 +231,13 @@ const ForgotPassword = () => {
               >
                 {verifyOtpMutation.isPending ? "Verifying..." : "Verify OTP"}
               </button>
+
               <div className="text-center text-sm mt-4">
                 {canResend ? (
                   <button
-                    onClick={resendOtp}
+                    onClick={() =>
+                      requestOtpMutation.mutate({ email: userEmail! })
+                    }
                     className="text-blue-500 cursor-pointer"
                   >
                     Resend OTP
@@ -256,9 +259,7 @@ const ForgotPassword = () => {
               </h3>
 
               <form onSubmit={handleSubmit(onSubmitPassword)}>
-                <label className="block text-gray-700 mb-1">
-                  New Password
-                </label>
+                <label className="block text-gray-700 mb-1">New Password</label>
                 <input
                   type="password"
                   placeholder="Enter new password"
@@ -275,6 +276,9 @@ const ForgotPassword = () => {
                   <p className="text-red-500 text-sm">
                     {String(errors.password.message)}
                   </p>
+                )}
+                {serverError && (
+                  <p className="text-red-500 text-sm mt-1">{serverError}</p>
                 )}
 
                 <button

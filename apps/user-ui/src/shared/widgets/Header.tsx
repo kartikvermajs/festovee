@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import React from "react";
 import { Search } from "lucide-react";
@@ -7,8 +8,10 @@ import cartoutline from "../../assets/svgs/cartoutline.svg";
 import logo from "../../assets/svgs/favicon.ico";
 import Image from "next/image";
 import HeaderBottom from "./HeaderBottom";
+import useUser from "../../hooks/useUser";
 
 const Header = () => {
+  const { user, isLoading } = useUser();
   return (
     <div className="w-full bg-white">
       {/* Top Header */}
@@ -47,23 +50,47 @@ const Header = () => {
         <div className="flex items-center gap-6 md:gap-8">
           {/* Profile */}
           <div className="flex items-center gap-2">
-            <Link href={"/login"}>
-              <Image
-                src={profile}
-                alt="profile"
-                width={40}
-                height={40}
-                className="w-8 h-8 md:w-10 md:h-10"
-              />
-            </Link>
-            <Link href={"/login"} className="text-center md:text-left">
-              <span className="block text-xs md:text-sm font-medium">
-                Hello,
-              </span>
-              <span className="text-sm md:text-base font-semibold">
-                Sign In
-              </span>
-            </Link>
+            {!isLoading && user ? (
+              <Link href={"/profile"} className="flex gap-2">
+                <div>
+                  <Image
+                    src={profile}
+                    alt="profile"
+                    width={40}
+                    height={40}
+                    className="w-8 h-8 md:w-10 md:h-10"
+                  />
+                </div>
+                <div className="text-center md:text-left">
+                  <span className="block text-xs md:text-sm font-medium">
+                    Hello,
+                  </span>
+                  <span className="text-sm md:text-base font-semibold">
+                    {user?.name?.split(" ")[0]}
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <>
+                <Link href={"/login"}>
+                  <Image
+                    src={profile}
+                    alt="profile"
+                    width={40}
+                    height={40}
+                    className="w-8 h-8 md:w-10 md:h-10"
+                  />
+                </Link>
+                <Link href={"/login"} className="text-center md:text-left">
+                  <span className="block text-xs md:text-sm font-medium">
+                    Hello,
+                  </span>
+                  <span className="text-sm md:text-base font-semibold">
+                    {isLoading ? "..." : "Sign In"}
+                  </span>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Wishlist + Cart */}
@@ -72,11 +99,11 @@ const Header = () => {
               <Image
                 src={heartoutline}
                 alt="heart"
-                width={28}
-                height={28}
-                className="w-6 h-6 md:w-8 md:h-8"
+                width={58}
+                height={58}
+                // className="w-7 h-7 md:w-8 md:h-8"
               />
-              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute -top-2 -right-2">
+              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute -top-0 -right-1">
                 <span className="text-white text-[10px] md:text-sm font-medium">
                   0
                 </span>
@@ -90,7 +117,7 @@ const Header = () => {
                 height={28}
                 className="w-6 h-6 md:w-8 md:h-8"
               />
-              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute -top-2 -right-2">
+              <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute -top-3 -right-6">
                 <span className="text-white text-[10px] md:text-sm font-medium">
                   0
                 </span>

@@ -7,10 +7,14 @@ import profile from "../../assets/svgs/profile.svg";
 import heartoutline from "../../assets/svgs/heartoutline.svg";
 import cartoutline from "../../assets/svgs/cartoutline.svg";
 import Image from "next/image";
+import useUser from "../../hooks/useUser";
 
 const HeaderBottom = () => {
   const [show, setShow] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const { user, isLoading } = useUser();
+
+  console.log(user);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,30 +77,59 @@ const HeaderBottom = () => {
         {/* Right Section */}
         <div className="w-full lg:w-auto mt-3 lg:mt-0">
           {isSticky && (
-            <div className="w-full lg:w-[80%] py-3 md:py-5 m-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-6 md:gap-8">
               {/* Profile */}
               <div className="flex items-center gap-2">
-                <Link href={"/login"}>
-                  <Image
-                    src={profile}
-                    alt="profile"
-                    width={40}
-                    height={40}
-                    className="w-8 h-8 md:w-10 md:h-10"
-                  />
-                </Link>
-                <Link href={"/login"} className="text-center sm:text-left">
-                  <span className="block text-xs md:text-sm font-medium">
-                    Hello,
-                  </span>
-                  <span className="text-sm md:text-base font-semibold">
-                    Sign In
-                  </span>
-                </Link>
+                {!isLoading && user ? (
+                  <Link href={"/profile"} className="flex gap-2">
+                    <div>
+                      <Image
+                        src={profile}
+                        alt="profile"
+                        width={40}
+                        height={40}
+                        className="w-8 h-8 md:w-10 md:h-10"
+                      />
+                    </div>
+                    <div>
+                      <Link
+                        href={"/profile"}
+                        className="text-center md:text-left"
+                      >
+                        <span className="block text-xs md:text-sm font-medium">
+                          Hello,
+                        </span>
+                        <span className="text-sm md:text-base font-semibold">
+                          {user?.name?.split(" ")[0]}
+                        </span>
+                      </Link>
+                    </div>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href={"/login"}>
+                      <Image
+                        src={profile}
+                        alt="profile"
+                        width={40}
+                        height={40}
+                        className="w-8 h-8 md:w-10 md:h-10"
+                      />
+                    </Link>
+                    <Link href={"/login"} className="text-center md:text-left">
+                      <span className="block text-xs md:text-sm font-medium">
+                        Hello,
+                      </span>
+                      <span className="text-sm md:text-base font-semibold">
+                        {isLoading ? "..." : "Sign In"}
+                      </span>
+                    </Link>
+                  </>
+                )}
               </div>
 
               {/* Wishlist + Cart */}
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-4 md:gap-5">
                 <Link href={"/wishlist"} className="relative">
                   <Image
                     src={heartoutline}
@@ -105,8 +138,10 @@ const HeaderBottom = () => {
                     height={28}
                     className="w-6 h-6 md:w-8 md:h-8"
                   />
-                  <div className="w-5 h-5 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute -top-2 -right-2">
-                    <span className="text-white text-xs font-medium">0</span>
+                  <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute -top-2 -right-2">
+                    <span className="text-white text-[10px] md:text-sm font-medium">
+                      0
+                    </span>
                   </div>
                 </Link>
                 <Link href={"/cart"} className="relative">
@@ -117,8 +152,10 @@ const HeaderBottom = () => {
                     height={28}
                     className="w-6 h-6 md:w-8 md:h-8"
                   />
-                  <div className="w-5 h-5 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute -top-2 -right-2">
-                    <span className="text-white text-xs font-medium">0</span>
+                  <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-white bg-red-500 rounded-full flex items-center justify-center absolute -top-2 -right-2">
+                    <span className="text-white text-[10px] md:text-sm font-medium">
+                      0
+                    </span>
                   </div>
                 </Link>
               </div>
