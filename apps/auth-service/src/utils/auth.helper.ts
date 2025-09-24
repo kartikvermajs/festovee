@@ -79,8 +79,8 @@ export const sendOtp = async (
   await sendEmail(email, "Verify your email", template, { name, otp });
 
   // Store OTP and cooldown in Redis
-  await redis.set(`otp:${email}`, otp, "EX", 300); // 5 minutes
-  await redis.set(`otp_cooldown:${email}`, "true", "EX", 60); // 1 minute cooldown
+  await redis.set(`otp:${email}`, otp, "EX", 300);
+  await redis.set(`otp_cooldown:${email}`, "true", "EX", 60);
 };
 
 export const verifyOtp = async (
@@ -125,15 +125,22 @@ export const handleForgotPassword = async (
     if (!email) throw new ValidationError("Email is required!");
 
     const user =
-      userType === "user" &&
-      (await prisma.users.findUnique({ where: { email } }));
+      userType === "user"
+        ? await prisma.users.findUnique({ where: { email } })
+        : await prisma.sellers.findUnique({ where: { email } });
 
     if (!user) throw new ValidationError(`${userType} not found!`);
 
     await checkOtpRestriction(email, next);
     await trackOtpRequests(email, next);
 
-    await sendOtp(user.name,email, "forgot-password-user-mail");
+    await sendOtp(
+      user.name,
+      email,
+      userType === "user"
+        ? "forgot-password-user-mail"
+        : "forgot-password-seller-email"
+    );
 
     res
       .status(200)
@@ -146,7 +153,7 @@ export const handleForgotPassword = async (
 export const verifyForgotPasswordOtp = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const { email, otp } = req.body;
