@@ -11,6 +11,7 @@ import Input from "packages/components/input/input";
 import React, { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import ReactTextEditor from "packages/components/rich-text-editor";
+import SizeSelector from "packages/components/size-selector";
 
 const page = () => {
   const {
@@ -23,7 +24,7 @@ const page = () => {
   } = useForm();
 
   const [openImageModal, setOpenImageModal] = useState(false);
-  const [isChanged, setIsChanged] = useState(false);
+  const [isChanged, setIsChanged] = useState(true);
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [loading, setLoading] = useState(false);
 
@@ -86,6 +87,8 @@ const page = () => {
     });
     setValue("images", images);
   };
+
+  const handleSaveDraft = () => {};
 
   return (
     <form
@@ -383,10 +386,141 @@ const page = () => {
                     />
                   )}
                 />
+                {errors.detailed_description && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.detailed_description.message as string}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-2">
+                <Input
+                  label="Video URL"
+                  placeholder="https://www.youtube.com/example/xyz"
+                  {...register("video_url", {
+                    pattern: {
+                      value:
+                        /^https:\/\/(www\.)?youtube\.com\/embed\/[a-zA-Z0-9_-]+$/,
+                      message:
+                        "Invalid Youtube embed URL! Use format: https://www.youtube.com/",
+                    },
+                  })}
+                />
+                {errors.video_url && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.video_url.message as string}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-2">
+                <Input
+                  label="Regular Price"
+                  placeholder="Rs.500"
+                  {...register("regular_price", {
+                    valueAsNumber: true,
+                    min: {
+                      value: 1,
+                      message: "Price must be at least Rs.1",
+                    },
+                    validate: (value) =>
+                      !isNaN(value) || "Only numbers are allowed",
+                  })}
+                />
+                {errors.regular_price && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.regular_price.message as string}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-2">
+                <Input
+                  label="Sale Price"
+                  placeholder="Rs.300"
+                  {...register("sale_price", {
+                    required: "Sale Price is required",
+                    valueAsNumber: true,
+                    min: {
+                      value: 1,
+                      message: "Sale Price must be at least Rs.1",
+                    },
+                    validate: (value) => {
+                      if (isNaN(value)) return "Only numbers are allowed";
+                      if (regularPrice && value >= regularPrice) {
+                        return "Sale Price must be less than Regular Price";
+                      }
+                      return true;
+                    },
+                  })}
+                />
+                {errors.sale_price && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.sale_price.message as string}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-2">
+                <Input
+                  label="Stock *"
+                  placeholder="100"
+                  {...register("stock", {
+                    required: "Stock is required!",
+                    valueAsNumber: true,
+                    min: {
+                      value: 1,
+                      message: "Stock must be at least Rs.1",
+                    },
+                    max: {
+                      value: 1000,
+                      message: "Stock cannot exceed 1,000",
+                    },
+                    validate: (value) => {
+                      if (isNaN(value)) return "Only numbers are allowed";
+                      if (!Number.isInteger(value))
+                        return "Stock must be a whole number";
+                      return true;
+                    },
+                  })}
+                />
+                {errors.stock && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.stock.message as string}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-2">
+                <SizeSelector control={control} errors={errors} />
+              </div>
+
+              <div className="mt-3">
+                <label className="block font-semibold text-gray-300 mb-1">
+                  Select Discount Codes (optional)
+                </label>
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div className="mt-6 flex justify-end gap-3">
+        {isChanged && (
+          <button
+            type="button"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md"
+            onClick={handleSaveDraft}
+          >
+            Save Draft
+          </button>
+        )}
+        <button
+          type="button"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md"
+          onClick={handleSaveDraft}
+        >
+          {loading ? "Creating..." : "Create"}
+        </button>
       </div>
     </form>
   );
