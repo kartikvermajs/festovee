@@ -78,5 +78,4 @@ model sellers {
   createAt     DateTime @default(now())
   updatedAt    DateTime @updatedAt
   shopId       String?  @db.ObjectId
-  shopsId      String?  @db.ObjectId
 }
