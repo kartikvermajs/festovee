@@ -52,7 +52,7 @@ const CustomProperties = ({ control, errors }: any) => {
                       key={index}
                       className="border border-gray-700 rounded-lg bg-gray-900"
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mx-2 font-Poppins">
                         <span className="text-white font-medium">
                           {property.label}
                         </span>
@@ -65,7 +65,7 @@ const CustomProperties = ({ control, errors }: any) => {
                       </div>
 
                       {/* Add value to property */}
-                      <div className="flex items-center mt-2 gap-2">
+                      <div className="flex items-center m-2 mt-1 gap-2">
                         <input
                           type="text"
                           className="border outline-none border-gray-700 bg-gray-800 p-2 rounded-md text-white w-full"
@@ -76,7 +76,7 @@ const CustomProperties = ({ control, errors }: any) => {
 
                         <button
                           type="button"
-                          className="px-3 py-1 bg-blue-500 text-white rounded-md"
+                          className="px-3 py-2 bg-blue-500 text-white rounded-md"
                           onClick={() => addValue(index)}
                         >
                           Add
