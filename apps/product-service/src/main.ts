@@ -1,9 +1,10 @@
 import * as dotenv from "dotenv";
+import "./jobs/product-crone.job";
 dotenv.config();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-// import swaggerUi from "swagger-ui-express";
+import swaggerUi from "swagger-ui-express";
 import swaggerDocument = require("./swagger-output.json");
 import { errorMiddleware } from "@packages/error-handler/error-middleware";
 import router from "./routes/product.routes";
@@ -25,11 +26,10 @@ app.get("/", (req, res) => {
   res.send({ message: "Hello Product API" });
 });
 
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-// app.get("/docs-json", (req, res) => {
-//   res.json(swaggerDocument);
-// });
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.get("/docs-json", (req, res) => {
+  res.json(swaggerDocument);
+});
 
 app.use("/api", router);
 app.use(errorMiddleware);
