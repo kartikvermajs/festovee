@@ -8,6 +8,13 @@ const { composePlugins, withNx } = require("@nx/next");
  **/
 const nextConfig = {
   nx: {},
+  images: {
+    remotePatterns: [
+      {
+        hostname: "ik.imagekit.io",
+      },
+    ],
+  },
 
   webpack(config) {
     config.module.rules.push({
@@ -20,8 +27,6 @@ const nextConfig = {
   },
 };
 
-const plugins = [
-  withNx,
-];
+const plugins = [withNx];
 
 module.exports = composePlugins(...plugins)(nextConfig);

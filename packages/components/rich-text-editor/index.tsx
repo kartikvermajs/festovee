@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import "react-quill-new/dist/quill.snow.css";
-import ReactQuill from "react-quill-new";
+// import ReactQuill from "react-quill-new";
+import dynamic from "next/dynamic";
+
+const ReactQuill = dynamic(() => import("react-quill-new"), {
+  ssr: false,
+});
 
 const ReactTextEditor = ({
   value,
