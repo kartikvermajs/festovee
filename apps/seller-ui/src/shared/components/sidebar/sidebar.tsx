@@ -125,9 +125,9 @@ const SideBarWrapper = () => {
                 }
               />
               <SidebarItem
-                isActive={activeSidebar === "/dashboard/all-product"}
+                isActive={activeSidebar === "/dashboard/all-products"}
                 title="All Product"
-                href="/dashboard/all-product"
+                href="/dashboard/all-products"
                 icon={
                   <Package
                     size={24}

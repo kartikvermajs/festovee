@@ -1,3 +1,4 @@
+import { products } from "./../../../../node_modules/.prisma/client/index.d";
 import {
   AuthError,
   NotFoundError,
@@ -246,7 +247,7 @@ export const createProduct = async (
         category,
         subCategory,
         colors: colors || [],
-        discount_codes: discountCodes.map((codeId:string) => codeId),
+        discount_codes: discountCodes.map((codeId: string) => codeId),
         sizes: sizes || [],
         stock: parseInt(stock),
         sale_price: parseFloat(sale_price),
@@ -271,5 +272,31 @@ export const createProduct = async (
   } catch (error) {
     next(error);
     console.log("Cannot add product.");
+  }
+};
+
+//get logged in seller products
+export const getShopProducts = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const products = await prisma.products.findMany({
+      where: {
+        shopId: req?.seller?.shop?.id,
+      },
+      include: {
+        images: true,
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    next(error);
+    console.log("Error while getting logged in seller products.");
   }
 };
