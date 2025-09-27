@@ -22,10 +22,18 @@ import sellerAxiosInstance from "apps/seller-ui/src/utils/sellerAxiosInstance";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import DeleteConfirmationModal from "apps/seller-ui/src/shared/components/modals/delete.confirmation.model";
 
 const fetchProducts = async () => {
   const res = await sellerAxiosInstance.get("/product/api/get-shop-products");
   return res?.data?.products;
+};
+
+const deleteProduct = async (productId: string) => {
+  await sellerAxiosInstance.delete(`/product/api/delete-product/${productId}`);
+};
+const restoreProduct = async (productId: string) => {
+  await sellerAxiosInstance.put(`/product/api/restore-product/${productId}`);
 };
 
 const ProductList = () => {
@@ -40,6 +48,22 @@ const ProductList = () => {
     queryKey: ["shop-products"],
     queryFn: fetchProducts,
     staleTime: 1000 * 60 * 5,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["shop-products"] });
+      setShowDeleteModal(false);
+    },
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: restoreProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["shop-products"] });
+      setShowDeleteModal(false);
+    },
   });
 
   const columns = useMemo(
@@ -164,6 +188,11 @@ const ProductList = () => {
     onGlobalFilterChange: setGlobalFilter,
   });
 
+  const openDeleteModal = (product: any) => {
+    setSelectedProduct(product);
+    setShowDeleteModal(true);
+  };
+
   return (
     <div className="w-full min-h-screen p-8">
       {/* Header */}
@@ -237,6 +266,14 @@ const ProductList = () => {
               ))}
             </tbody>
           </table>
+        )}
+        {showDeleteModal && (
+          <DeleteConfirmationModal
+            product={selectedProduct}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={() => deleteMutation.mutate(selectedProduct?.id)}
+            onRestore={() => restoreMutation.mutate(selectedProduct?.id)}
+          />
         )}
       </div>
     </div>
